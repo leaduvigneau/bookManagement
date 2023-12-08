@@ -1,5 +1,6 @@
 package com.jicay.bookmanagement
 
+import io.cucumber.junit.CucumberOptions
 import io.cucumber.junit.platform.engine.Constants.GLUE_PROPERTY_NAME
 import io.cucumber.spring.CucumberContextConfiguration
 import org.junit.platform.suite.api.ConfigurationParameter

@@ -10,11 +10,14 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.http.MediaType
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
+import org.springframework.test.web.servlet.put
+import org.springframework.web.servlet.function.RequestPredicates.contentType
 
 @ExtendWith(SpringExtension::class)
 @WebMvcTest
@@ -96,5 +99,17 @@ class BookControllerIT {
         }
 
         verify(exactly = 0) { bookUseCase.addBook(any()) }
+    }
+
+    @Test
+    fun `rest route put reserve book by title`() {
+        val bookTitle = "Les"
+        justRun { bookUseCase.reserveBook(bookTitle) }
+
+        mockMvc.put("/reserve/{bookTitle}", bookTitle)
+                .andExpect {
+                    status { isOk() } }
+
+        verify(exactly = 1) { bookUseCase.reserveBook(bookTitle) }
     }
 }

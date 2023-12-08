@@ -13,7 +13,8 @@ class BookDAO(private val namedParameterJdbcTemplate: NamedParameterJdbcTemplate
             .query("SELECT * FROM BOOK", MapSqlParameterSource()) { rs, _ ->
                 Book(
                     name = rs.getString("title"),
-                    author = rs.getString("author")
+                    author = rs.getString("author"),
+                    isReserved = rs.getBoolean("is_reserved")
                 )
             }
     }
@@ -24,5 +25,30 @@ class BookDAO(private val namedParameterJdbcTemplate: NamedParameterJdbcTemplate
                 "title" to book.name,
                 "author" to book.author
             ))
+    }
+    override fun isBookReserved(bookTitle: String): Boolean {
+        val count = namedParameterJdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM BOOK WHERE title = :title AND is_reserved = TRUE",
+                MapSqlParameterSource().addValue("title", bookTitle),
+                Int::class.java
+        )
+        return (count ?: 0) > 0
+    }
+
+    override fun doesBookExist(bookTitle: String): Boolean {
+        val count = namedParameterJdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM BOOK WHERE title = :title",
+                MapSqlParameterSource().addValue("title", bookTitle),
+                Int::class.java
+        )
+        return (count ?: 0) > 0
+    }
+    override fun reserveBookByTitle(bookTitle: String, isReserved: Boolean) {
+        namedParameterJdbcTemplate.update(
+                "UPDATE BOOK SET is_reserved = :isReserved WHERE title = :title",
+                MapSqlParameterSource()
+                        .addValue("title", bookTitle)
+                        .addValue("isReserved", isReserved)
+        )
     }
 }

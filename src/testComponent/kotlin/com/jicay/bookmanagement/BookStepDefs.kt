@@ -68,6 +68,28 @@ class BookStepDefs {
 
     }
 
+    @When("the user reserves the book {string}")
+    fun reserveBook(title: String) {
+        given()
+                .`when`()
+                .put("/reserve/{title}", title)
+                .then()
+                .statusCode(200)
+    }
+
+    @Then("the book {string} should be marked as reserved")
+    fun checkBookReserved(title: String) {
+        val response = given()
+                .`when`()
+                .get("/books")
+                .then()
+                .statusCode(200)
+                .extract().body().jsonPath()
+
+        val isReserved = response.get<Boolean>("find { it.name == '$title' }.isReserved")
+        assertThat(isReserved).isEqualTo(true)
+    }
+
     companion object {
         lateinit var lastBookResult: ValidatableResponse
     }
