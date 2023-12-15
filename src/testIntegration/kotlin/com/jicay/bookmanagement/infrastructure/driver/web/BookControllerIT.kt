@@ -104,7 +104,8 @@ class BookControllerIT {
     @Test
     fun `rest route put reserve book by title`() {
         val bookTitle = "Les"
-        justRun { bookUseCase.reserveBook(bookTitle) }
+
+        every { bookUseCase.reserveBook(bookTitle) } returns "Book reserved successfully."
 
         mockMvc.put("/reserve/{bookTitle}", bookTitle)
                 .andExpect {
